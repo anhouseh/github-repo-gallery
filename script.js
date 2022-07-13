@@ -3,6 +3,8 @@ const username = "anhouseh";
 const repoList = document.querySelector(".repo-list");
 const allReposContainer = document.querySelector(".repos");
 const repoData = document.querySelector(".repo-data");
+const viewReposButton = document.querySelector(".view-repos");
+const filterInpurt = document.querySelector(".filter-repos");
 
 const gitUserInfo = async function () {
     const userInfo = await fetch (`https://api.github.com/users/${username}`);
@@ -26,16 +28,17 @@ const displayUserInfo = function (data) {
  </div>`;
 
  overview.append(div);
- gitRepos();
+ gitRepos(username);
 };
 
-const gitRepos= async function () {
-  const fetchRepos = await fetch (`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`);
+const gitRepos= async function (username) {
+  const fetchRepos = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`);
   const repoData = await fetchRepos.json();
   displayRepos(repoData);
 };
 
   const displayRepos = function (repos) {
+    filterInpurt.classList.remove("hide");
     for (const repo of repos) {
       const repoItem = document.createElement("li");
       repoItem.classList.add("repo");
@@ -49,7 +52,6 @@ const gitRepos= async function () {
     const repoName = e.target.innerText;
     getRepoInfo(repoName);
     }
-
   });
 
   const getRepoInfo = async function (repoName) {
@@ -60,7 +62,7 @@ const gitRepos= async function () {
     const fetchLanguages = await fetch (repoInfo.languages_url);
     const languageData = await fetchLanguages.json();
 
-    const languages [];
+    const languages = [];
     for (const language in languageData) {
       languages.push(language);
     }
@@ -68,6 +70,9 @@ const gitRepos= async function () {
     displayRepoInfo(repoInfo, languages);
   };
 
+  viewReposButton.classList.remove("hide");
+  repoData.innerHTML = "";
+  repoData.classList.remove("hide");
   allReposContainer.classList.add("hide");
   const div = document.createElement("div");
   div.innerHTML = `
@@ -79,3 +84,24 @@ const gitRepos= async function () {
   `;
   repoData.append(div);
 };
+
+viewReposButton.addEventListener("click",function () {
+  allReposContainer.classList.remove("hide");
+  repoData.classList.add("hide");
+  viewReposButton.classList.add("hide");
+});
+
+filterInpurt.addEventListener("input, function (e) {
+  const searchText = e.target.value;
+  const repos = doucment.querySelectorAll(".repo");
+  const searchLowerText = searchText.toLowerCase();
+
+  for (const repo of repos) {
+    const repoLowerText = repo.innerText.toLowerCase();
+    if (repoLowerText.includes (searchLowerText)) {
+      repo.classList.remove("hide");
+    } else {
+      repo.classList.remove("hide");
+    }
+  }
+});
